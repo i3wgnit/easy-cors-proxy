@@ -3,16 +3,19 @@ var http = require('http'),
     url = require('url');
 
 var port = process.env.PORT || 8000,
-    proxyURL = process.env.PROXY_URL || 'http://registry.npmjs.org:80/',
+    proxyURL = 'http://localhost:18332',
     allowOrigin = process.env.ALLOW_ORIGIN || '*',
     allowMethods = process.env.ALLOW_METHODS || '*',
-    allowHeaders = process.env.ALLOW_HEADERS || 'X-Requested-With'
+    allowHeaders = process.env.ALLOW_HEADERS || '*'
 
 http.createServer(function (req, res) {
   var r = request(url.resolve(proxyURL, req.url));
 
   // Add CORS Headers
   r.on('response', function(_r) {
+    if (req.method === 'OPTIONS') {
+      _r.statusCode = 200;
+    }
     _r.headers['Access-Control-Allow-Origin'] = allowOrigin;
     _r.headers['Access-Control-Allow-Methods'] = allowMethods;
     _r.headers['Access-Control-Allow-Headers'] = allowHeaders;
